@@ -13,9 +13,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_12_120000) do
     t.datetime "updated_at",      null: false
   end
 
-  add_index "users", ["user_name"], name: "index_users_on_user_name", unique: true
-  add_index "users", ["email"],     name: "index_users_on_email",     unique: true
-
   create_table "user_infos", id: :uuid, force: :cascade do |t|
     t.uuid     "user_id",         null: false
     t.string   "first_name",      null: false, limit: 50
@@ -28,6 +25,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_12_120000) do
     t.datetime "updated_at",      null: false
   end
 
-  add_index "user_infos", ["user_id"], name: "index_user_infos_on_user_id", unique: true
   add_foreign_key "user_infos", "users"
 end
