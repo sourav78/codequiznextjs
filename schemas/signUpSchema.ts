@@ -20,12 +20,6 @@ export const signUpSchema = z.object({
     })
     .min(8, { message: 'Password must be at least 8 characters long' }),
   confirmPassword: z.string().min(1, { message: 'Confirm Password is required' }),
-  verificationCode: z
-    .string()
-    .length(6, { message: 'Verification code must be exactly 6 characters' })
-    .regex(/^[0-9]+$/, {
-      message: 'Verification code must contain only numbers',
-    }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
