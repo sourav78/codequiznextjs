@@ -147,7 +147,7 @@ const SignupForm = () => {
           </p>
         </CardHeader>
 
-        {/* <Divider /> */}
+        <Divider />
 
         <CardBody className="py-6">
           {verificationError && (
@@ -230,6 +230,24 @@ const SignupForm = () => {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-2">
+            <label
+              htmlFor="username"
+              className="text-sm font-medium text-default-900"
+            >
+              username
+            </label>
+            <Input
+              id="username"
+              type="text"
+              placeholder="your name"
+              startContent={<Mail className="h-4 w-4 text-default-500" />}
+              isInvalid={!!errors.userName}
+              errorMessage={errors.userName?.message}
+              {...register("userName")}
+              className="w-full"
+            />
+          </div>
           <div className="space-y-2">
             <label
               htmlFor="email"
