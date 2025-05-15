@@ -7,7 +7,12 @@ module.exports = {
     "./node_modules/@heroui/theme/dist/components/(card|ripple).js",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        "hero-dark": "#1A1A1A",
+        "hero-light": "#F5F5F5",
+      },
+    },
   },
   darkMode: "class",
   plugins: [heroui()],
