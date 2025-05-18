@@ -3,6 +3,7 @@
 import {useForm} from 'react-hook-form'
 import { useSignUp } from '@clerk/nextjs'
 import {z} from 'zod'
+import axios, { AxiosError } from 'axios'
 
 // Custom zod signup schema
 import { signUpSchema } from '../../schemas/signUpSchema'
@@ -17,6 +18,9 @@ import {Divider} from "@heroui/divider";
 
 import {AlertCircle, CheckCircle, Eye, EyeOff, Lock, Mail} from 'lucide-react'
 import Link from 'next/link'
+import { User } from '@/db/schema'
+import { AuthApiResponse } from '@/types/AuthApiResponse'
+import { UserRequest } from '@/types/UserType'
 
 const SignupForm = () => {
 
@@ -53,6 +57,8 @@ const SignupForm = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
 
+  const [userInfo, setUserInfo] = useState<UserRequest | null>(null)
+
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
     
     // If the form is not loaded, return false
@@ -74,6 +80,12 @@ const SignupForm = () => {
       // Send a verification email to the user
       await signUp.prepareEmailAddressVerification({
         strategy: "email_code"
+      })
+
+      setUserInfo({
+        email: data.email,
+        userName: data.userName,
+        password: data.password
       })
 
       setVerifying(true)
@@ -118,6 +130,7 @@ const SignupForm = () => {
       if(result.status === "complete"){
         await setActive({session: result.createdSessionId})
 
+        await handleCreateNewUserInDB({userId: result.createdUserId, ...userInfo!})
         router.push("/")
       }else{
         console.error("Verification failed:", result);
@@ -131,6 +144,29 @@ const SignupForm = () => {
       );
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+
+  // This function is used to create a new user in the database
+  const handleCreateNewUserInDB = async (userData: UserRequest) => {
+    try{
+
+      // Send a POST request to the /api/auth/signup endpoint
+      const response = await axios.post<AuthApiResponse>("/api/auth/signup", {
+        userId: userData.userId,
+        userName: userData.userName,
+        email: userData.email,
+        password: userData.password
+      })
+
+      console.log(response.data);
+
+    }catch(error){
+
+      // If the error is an AxiosError, log the error message
+      const axiosError = error as AxiosError<AuthApiResponse>;
+      console.error("Error while creating new user in DB:", axiosError);
     }
   }
 

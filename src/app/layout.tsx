@@ -30,6 +30,7 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>  
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          cz-shortcut-listen="true"
         >
           <Providers>
             <div className="fixed top-4 right-4 z-50">

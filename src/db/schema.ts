@@ -6,17 +6,15 @@ import { relations } from "drizzle-orm";
 export const users = pgTable("users", {
 
   // Primary key
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  id: varchar("id", { length: 50 }).primaryKey().notNull(),
 
   // User fields
-  userName: varchar("name", { length: 50 }).unique().notNull(),
+  userName: varchar("username", { length: 50 }).unique().notNull(),
   email: varchar("email", { length: 255 }).unique().notNull(),
-  password: varchar("password", { length: 50 }),
+  password: varchar("password", { length: 255 }),
 
   // Verification fields
   isAdmin: boolean("is_admin").default(false).notNull(),
-  isVerified: boolean("is_verified").default(false).notNull(),
-  verificationCode: varchar("verification_code", { length: 6 }),
 
   // timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -36,7 +34,7 @@ export const userInfo = pgTable("user_info", {
 
   // Foreign key
   // This is a reference to the users table
-  userId: uuid("user_id").unique().notNull().references(() => users.id),
+  userId: varchar("user_id", { length: 50 }).unique().notNull().references(() => users.id),
 
   // User info fields
   firstName: varchar("first_name", { length: 50 }).notNull(),
@@ -64,8 +62,8 @@ export const userRelations = relations(users, ({ one }) => ({
 
 // 
 
-export const User = typeof users.$inferSelect;
-export const UserInsert = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type UserInsert = typeof users.$inferInsert;
 
-export const UserInfo = typeof userInfo.$inferSelect;
-export const UserInfoInsert = typeof userInfo.$inferInsert;
+export type UserInfo = typeof userInfo.$inferSelect;
+export type UserInfoInsert = typeof userInfo.$inferInsert;
