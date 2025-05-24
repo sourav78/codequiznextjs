@@ -1,8 +1,8 @@
 "use client"
 
-import {useForm} from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { useSignUp } from '@clerk/nextjs'
-import {z} from 'zod'
+import { z } from 'zod'
 import axios, { AxiosError } from 'axios'
 
 // Custom zod signup schema
@@ -11,29 +11,29 @@ import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 
-import {Card, CardBody, CardFooter, CardHeader} from "@heroui/card";
-import {Button} from "@heroui/button";
-import {Input} from "@heroui/input";
-import {Divider} from "@heroui/divider"; 
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
+import { Divider } from "@heroui/divider";
 
-import {AlertCircle, CheckCircle, Eye, EyeOff, Lock, Mail} from 'lucide-react'
+import { AlertCircle, CheckCircle, Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { User } from '@/db/schema'
 import { AuthApiResponse } from '@/types/AuthApiResponse'
 import { UserRequest } from '@/types/UserType'
+import { Card, CardBody, CardFooter, CardHeader } from '@heroui/card'
 
 const SignupForm = () => {
 
   const router = useRouter()
 
   // Destucturing useSignUp hook to get all the methods.
-  const {signUp, isLoaded, setActive} = useSignUp()
+  const { signUp, isLoaded, setActive } = useSignUp()
 
   // Destucturing useForm hook to get all the methods.
   const {
-    register, 
+    register,
     handleSubmit, // 
-    formState: {errors}
+    formState: { errors }
   } = useForm<z.infer<typeof signUpSchema>>({
     // Specifying the resolver
     resolver: zodResolver(signUpSchema),
@@ -60,7 +60,7 @@ const SignupForm = () => {
   const [userInfo, setUserInfo] = useState<UserRequest | null>(null)
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
-    
+
     // If the form is not loaded, return false
     if (!isLoaded) return;
 
@@ -68,7 +68,7 @@ const SignupForm = () => {
     setIsSubmitting(true)
     setAuthError(null)
 
-    try{
+    try {
 
       // Create a new user in clerk
       await signUp.create({
@@ -89,15 +89,15 @@ const SignupForm = () => {
       })
 
       setVerifying(true)
-    }catch(error: any){
+    } catch (error: any) {
       console.error("Sign-up error:", error);
 
       // Set the error message
       setAuthError(
         error.errors?.[0]?.message ||
-          "An error occurred during sign-up. Please try again."
+        "An error occurred during sign-up. Please try again."
       );
-    }finally{
+    } finally {
 
       // Set the isSubmitting to false
       setIsSubmitting(false)
@@ -116,7 +116,7 @@ const SignupForm = () => {
     setIsSubmitting(true)
     setAuthError(null)
 
-    try{
+    try {
 
       // Attempt to verify the email address with the provided verification code
       const result = await signUp.attemptEmailAddressVerification({
@@ -127,20 +127,20 @@ const SignupForm = () => {
 
       // If the verification is successful, set the active session
       // and redirect to the home page
-      if(result.status === "complete"){
-        await setActive({session: result.createdSessionId})
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId })
 
-        await handleCreateNewUserInDB({userId: result.createdUserId, ...userInfo!})
+        await handleCreateNewUserInDB({ userId: result.createdUserId, ...userInfo! })
         router.push("/")
-      }else{
+      } else {
         console.error("Verification failed:", result);
         setVerificationError("Verification failed. Please try again.")
       }
-    }catch(error: any){
+    } catch (error: any) {
       console.error("Verification error:", error);
       setVerificationError(
         error.errors?.[0]?.message ||
-          "An error occurred during verification. Please try again."
+        "An error occurred during verification. Please try again."
       );
     } finally {
       setIsSubmitting(false);
@@ -150,7 +150,7 @@ const SignupForm = () => {
 
   // This function is used to create a new user in the database
   const handleCreateNewUserInDB = async (userData: UserRequest) => {
-    try{
+    try {
 
       // Send a POST request to the /api/auth/signup endpoint
       const response = await axios.post<AuthApiResponse>("/api/auth/signup", {
@@ -162,7 +162,7 @@ const SignupForm = () => {
 
       console.log(response.data);
 
-    }catch(error){
+    } catch (error) {
 
       // If the error is an AxiosError, log the error message
       const axiosError = error as AxiosError<AuthApiResponse>;
@@ -173,27 +173,22 @@ const SignupForm = () => {
   // This component is shown when we need to enter OTP
   if (verifying) {
     return (
-      <Card className="w-full max-w-md border border-default-200 bg-default-50 shadow-xl">
-        <CardHeader className="flex flex-col gap-1 items-center pb-2">
-          <h1 className="text-2xl font-bold text-default-900">
-            Verify Your Email
-          </h1>
+    <>
+      <Card className="bg-white dark:bg-card-dark gap-0 max-w-lg w-full rounded">
+        <CardHeader className="p-0 pt-8 px-4 sm:px-10 w-full flex flex-col items-start">
+          <h4 className="font-roboto font-bold text-2xl">Verify Your Email</h4>
           <p className="text-default-500 text-center">
             We've sent a verification code to your email
           </p>
         </CardHeader>
-
-        <Divider />
-
-        <CardBody className="py-6">
+        <CardBody className="overflow-visible mt-4 pb-2 px-4 sm:px-10 w-full">
           {verificationError && (
             <div className="bg-danger-50 text-danger-700 p-4 rounded-lg mb-6 flex items-center gap-2">
               <AlertCircle className="h-5 w-5 flex-shrink-0" />
               <p>{verificationError}</p>
             </div>
           )}
-
-          <form onSubmit={handleVerificationSubmit} className="space-y-6">
+          <form onSubmit={handleVerificationSubmit} className="space-y-4">
             <div className="space-y-2">
               <label
                 htmlFor="verificationCode"
@@ -204,25 +199,31 @@ const SignupForm = () => {
               <Input
                 id="verificationCode"
                 type="text"
+                radius="sm"
+                variant='bordered'
+                size='lg'
                 placeholder="Enter the 6-digit code"
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value)}
-                className="w-full"
+                className="w-full mt-1"
                 autoFocus
               />
             </div>
 
             <Button
-              type="submit"
-              color="primary"
-              className="w-full"
+              type='submit'
+              color='primary'
+              className="w-full mt-4"
               isLoading={isSubmitting}
+              size='lg'
+              radius='sm'
             >
               {isSubmitting ? "Verifying..." : "Verify Email"}
             </Button>
           </form>
-
-          <div className="mt-6 text-center">
+        </CardBody>
+        <CardFooter className="w-full">
+          <div className="w-full py-6 rounded-sm flex justify-center items-center gap-2 bg-blue-500/10 dark:bg-blue-900/10">
             <p className="text-sm text-default-500">
               Didn't receive a code?{" "}
               <button
@@ -239,173 +240,325 @@ const SignupForm = () => {
               </button>
             </p>
           </div>
-        </CardBody>
+        </CardFooter>
       </Card>
-    )
+    </>
+  )
   }
 
+  // return (
+  //   <Card className=" w-full max-w-md border border-default-200 shadow-xl">
+  //     <CardHeader className="flex flex-col gap-1 items-center pb-2">
+  //       <h1 className="text-2xl font-bold text-default-900">
+  //         Create Your Account
+  //       </h1>
+  //       <p className="text-default-500 text-center">
+  //         Sign up to start managing your images securely
+  //       </p>
+  //     </CardHeader>
+
+  //     <Divider />
+
+  //     <CardBody className="py-6">
+  //       {authError && (
+  //         <div className="bg-danger-50 text-danger-700 p-4 rounded-lg mb-6 flex items-center gap-2">
+  //           <AlertCircle className="h-5 w-5 flex-shrink-0" />
+  //           <p>{authError}</p>
+  //         </div>
+  //       )}
+
+  //       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+  //         <div className="space-y-2">
+  //           <label
+  //             htmlFor="username"
+  //             className="text-sm font-medium text-default-900"
+  //           >
+  //             username
+  //           </label>
+  //           <Input
+  //             id="username"
+  //             type="text"
+  //             placeholder="your name"
+  //             startContent={<Mail className="h-4 w-4 text-default-500" />}
+  //             isInvalid={!!errors.userName}
+  //             errorMessage={errors.userName?.message}
+  //             {...register("userName")}
+  //             className="w-full"
+  //           />
+  //         </div>
+  //         <div className="space-y-2">
+  //           <label
+  //             htmlFor="email"
+  //             className="text-sm font-medium text-default-900"
+  //           >
+  //             Email
+  //           </label>
+  //           <Input
+  //             id="email"
+  //             type="email"
+  //             placeholder="your.email@example.com"
+  //             startContent={<Mail className="h-4 w-4 text-default-500" />}
+  //             isInvalid={!!errors.email}
+  //             errorMessage={errors.email?.message}
+  //             {...register("email")}
+  //             className="w-full"
+  //           />
+  //         </div>
+
+  //         <div className="space-y-2">
+  //           <label
+  //             htmlFor="password"
+  //             className="text-sm font-medium text-default-900"
+  //           >
+  //             Password
+  //           </label>
+  //           <Input
+  //             id="password"
+  //             type={showPassword ? "text" : "password"}
+  //             placeholder="••••••••"
+  //             startContent={<Lock className="h-4 w-4 text-default-500" />}
+  //             endContent={
+  //               <Button
+  //                 isIconOnly
+  //                 variant="light"
+  //                 size="sm"
+  //                 onClick={() => setShowPassword(!showPassword)}
+  //                 type="button"
+  //               >
+  //                 {showPassword ? (
+  //                   <EyeOff className="h-4 w-4 text-default-500" />
+  //                 ) : (
+  //                   <Eye className="h-4 w-4 text-default-500" />
+  //                 )}
+  //               </Button>
+  //             }
+  //             isInvalid={!!errors.password}
+  //             errorMessage={errors.password?.message}
+  //             {...register("password")}
+  //             className="w-full"
+  //           />
+  //         </div>
+
+  //         <div className="space-y-2">
+  //           <label
+  //             htmlFor="passwordConfirmation"
+  //             className="text-sm font-medium text-default-900"
+  //           >
+  //             Confirm Password
+  //           </label>
+  //           <Input
+  //             id="passwordConfirmation"
+  //             type={showConfirmPassword ? "text" : "password"}
+  //             placeholder="••••••••"
+  //             startContent={<Lock className="h-4 w-4 text-default-500" />}
+  //             endContent={
+  //               <Button
+  //                 isIconOnly
+  //                 variant="light"
+  //                 size="sm"
+  //                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+  //                 type="button"
+  //               >
+  //                 {showConfirmPassword ? (
+  //                   <EyeOff className="h-4 w-4 text-default-500" />
+  //                 ) : (
+  //                   <Eye className="h-4 w-4 text-default-500" />
+  //                 )}
+  //               </Button>
+  //             }
+  //             isInvalid={!!errors.confirmPassword}
+  //             errorMessage={errors.confirmPassword?.message}
+  //             {...register("confirmPassword")}
+  //             className="w-full"
+  //           />
+  //         </div>
+
+  //         <div className="space-y-4">
+  //           <div className="flex items-start gap-2">
+  //             <CheckCircle className="h-5 w-5 text-primary mt-0.5" />
+  //             <p className="text-sm text-default-600">
+  //               By signing up, you agree to our Terms of Service and Privacy
+  //               Policy
+  //             </p>
+  //           </div>
+  //         </div>
+
+  //         <Button
+  //           type="submit"
+  //           color="primary"
+  //           className="w-full"
+  //           isLoading={isSubmitting}
+  //         >
+  //           {isSubmitting ? "Creating account..." : "Create Account"}
+  //         </Button>
+  //       </form>
+  //     </CardBody>
+
+  //     <Divider />
+
+  //     <CardFooter className="flex justify-center py-4">
+  //       <p className="text-sm text-default-600">
+  //         Already have an account?{" "}
+  //         <Link
+  //           href="/sign-in"
+  //           className="text-primary hover:underline font-medium"
+  //         >
+  //           Sign in
+  //         </Link>
+  //       </p>
+  //     </CardFooter>
+  //   </Card>
+  // )
+
+  
   return (
-    <Card className="dark:bg-red-400 bg-green-400 w-full max-w-md border border-default-200 bg-default-50 shadow-xl">
-      <CardHeader className="flex flex-col gap-1 items-center pb-2">
-        <h1 className="text-2xl font-bold text-default-900">
-          Create Your Account
-        </h1>
-        <p className="text-default-500 text-center">
-          Sign up to start managing your images securely
-        </p>
-      </CardHeader>
-
-      <Divider />
-
-      <CardBody className="py-6">
-        {authError && (
-          <div className="bg-danger-50 text-danger-700 p-4 rounded-lg mb-6 flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 flex-shrink-0" />
-            <p>{authError}</p>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="space-y-2">
-            <label
-              htmlFor="username"
-              className="text-sm font-medium text-default-900"
-            >
-              username
-            </label>
-            <Input
-              id="username"
-              type="text"
-              placeholder="your name"
-              startContent={<Mail className="h-4 w-4 text-default-500" />}
-              isInvalid={!!errors.userName}
-              errorMessage={errors.userName?.message}
-              {...register("userName")}
-              className="w-full"
-            />
-          </div>
-          <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="text-sm font-medium text-default-900"
-            >
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your.email@example.com"
-              startContent={<Mail className="h-4 w-4 text-default-500" />}
-              isInvalid={!!errors.email}
-              errorMessage={errors.email?.message}
-              {...register("email")}
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium text-default-900"
-            >
-              Password
-            </label>
-            <Input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              startContent={<Lock className="h-4 w-4 text-default-500" />}
-              endContent={
-                <Button
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  onClick={() => setShowPassword(!showPassword)}
-                  type="button"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-default-500" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-default-500" />
-                  )}
-                </Button>
-              }
-              isInvalid={!!errors.password}
-              errorMessage={errors.password?.message}
-              {...register("password")}
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="passwordConfirmation"
-              className="text-sm font-medium text-default-900"
-            >
-              Confirm Password
-            </label>
-            <Input
-              id="passwordConfirmation"
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="••••••••"
-              startContent={<Lock className="h-4 w-4 text-default-500" />}
-              endContent={
-                <Button
-                  isIconOnly
-                  variant="light"
-                  size="sm"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  type="button"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4 text-default-500" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-default-500" />
-                  )}
-                </Button>
-              }
-              isInvalid={!!errors.confirmPassword}
-              errorMessage={errors.confirmPassword?.message}
-              {...register("confirmPassword")}
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-start gap-2">
-              <CheckCircle className="h-5 w-5 text-primary mt-0.5" />
-              <p className="text-sm text-default-600">
-                By signing up, you agree to our Terms of Service and Privacy
-                Policy
-              </p>
+    <>
+      <Card className="bg-white dark:bg-card-dark gap-0 max-w-lg w-full rounded">
+        <CardHeader className="p-0 pt-8 px-4 sm:px-10 w-full">
+          <h4 className="font-roboto font-bold text-2xl">Create your CodeQuiz account</h4>
+        </CardHeader>
+        <CardBody className="overflow-visible pb-2 px-4 sm:px-10 w-full">
+          {authError && (
+            <div className="bg-danger-50 text-danger-700 p-4 rounded-lg mb-6 flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 flex-shrink-0" />
+              <p>{authError}</p>
             </div>
+          )}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <label
+                htmlFor="username"
+                className="text-sm font-medium text-default-900"
+              >
+                Username
+              </label>
+              <Input
+                id='username'
+                type="text"
+                radius="sm"
+                variant='bordered'
+                isInvalid={!!errors.userName}
+                errorMessage={errors.userName?.message}
+                {...register("userName")}
+                className="w-full mt-1"
+                size='lg'
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="email"
+                className="text-sm font-medium text-default-900"
+              >
+                Email
+              </label>
+              <Input
+                id='email'
+                type="email"
+                radius="sm"
+                variant='bordered'
+                isInvalid={!!errors.email}
+                errorMessage={errors.email?.message}
+                {...register("email")}
+                className="w-full mt-1"
+                size='lg'
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="password"
+                className="text-sm font-medium text-default-900"
+              >
+                Password
+              </label>
+              <Input
+                id='password'
+                type={showPassword ? "text" : "password"}
+                radius="sm"
+                variant='bordered'
+                endContent={
+                  <Button
+                    isIconOnly
+                    variant="light"
+                    size="sm"
+                    onClick={() => setShowPassword(!showPassword)}
+                    type="button"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-default-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-default-500" />
+                    )}
+                  </Button>
+                }
+                isInvalid={!!errors.password}
+                errorMessage={errors.password?.message}
+                {...register("password")}
+                className="w-full mt-1"
+                size='lg'
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="confirmPassword"
+                className="text-sm font-medium text-default-900"
+              >
+                Confirm Password
+              </label>
+              <Input
+                id='confirmPassword'
+                type={showConfirmPassword ? "text" : "password"}
+                radius="sm"
+                variant='bordered'
+                endContent={
+                  <Button
+                    isIconOnly
+                    variant="light"
+                    size="sm"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    type="button"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4 text-default-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-default-500" />
+                    )}
+                  </Button>
+                }
+                isInvalid={!!errors.confirmPassword}
+                errorMessage={errors.confirmPassword?.message}
+                {...register("confirmPassword")}
+                className="w-full mt-1"
+                size='lg'
+              />
+            </div>
+
+            <Button
+              type='submit'
+              color='primary'
+              className="w-full mt-4"
+              isLoading={isSubmitting}
+              size='lg'
+              radius='sm'
+            >
+              {isSubmitting ? "Creating account..." : "Create Account"}
+            </Button>
+          </form>
+        </CardBody>
+        <CardFooter className="w-full">
+          <div className="w-full py-6 rounded-sm flex justify-center items-center gap-2 bg-blue-500/10 dark:bg-blue-900/10">
+            <p className="text-sm text-text dark:text-text-dark">
+              Already have an account?{" "}
+              <Link
+                href="/sign-in"
+                className="text-primary hover:underline font-medium"
+              >
+                Sign in
+              </Link>
+            </p>
           </div>
-
-          <Button
-            type="submit"
-            color="primary"
-            className="w-full"
-            isLoading={isSubmitting}
-          >
-            {isSubmitting ? "Creating account..." : "Create Account"}
-          </Button>
-        </form>
-      </CardBody>
-
-      <Divider />
-
-      <CardFooter className="flex justify-center py-4">
-        <p className="text-sm text-default-600">
-          Already have an account?{" "}
-          <Link
-            href="/sign-in"
-            className="text-primary hover:underline font-medium"
-          >
-            Sign in
-          </Link>
-        </p>
-      </CardFooter>
-    </Card>
+        </CardFooter>
+      </Card>
+    </>
   )
 }
 
