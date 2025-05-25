@@ -152,6 +152,14 @@ const SignInForm = () => {
               className="w-full mt-1"
               size='lg'
             />
+            <p className="text-sm text-right">
+              <Link
+                href="/forgot-password"
+                className="text-primary hover:underline font-medium"
+              >
+                Forgot password?
+              </Link>
+            </p>
           </div>
 
           <Button
@@ -170,7 +178,7 @@ const SignInForm = () => {
       <CardFooter className="w-full">
         <div className="w-full py-6 rounded-sm flex justify-center items-center gap-2 bg-blue-500/10 dark:bg-blue-900/10">
           <p className="text-sm text-text dark:text-text-dark">
-            Already have an account?{" "}
+            New to CodeQuiz?{" "}
             <Link
               href="/sign-up"
               className="text-primary hover:underline font-medium"
