@@ -116,7 +116,7 @@ const ForgotPasswordForm = () => {
       // If the verification is successful, then end the session
       // and redirect to the sign-in page
       if (result.status === "complete") {
-        // await setActive({ session: result.createdSessionId })
+        await setActive({ session: result.createdSessionId })
 
         console.log("Passord reset successfully")
 
@@ -124,7 +124,7 @@ const ForgotPasswordForm = () => {
         await handleResetPasswordInDB(email, data.password)
 
         // Signing out the current session
-        signOut({ redirectUrl: "/sign-in" })
+        await signOut({ redirectUrl: "/sign-in" })
       } else {
         console.error("Password reset failed:", result);
         setAuthError("Password reset failed. Please try again.")
@@ -148,7 +148,7 @@ const ForgotPasswordForm = () => {
     try {
 
       // Send a POST request to the /api/auth/forgot-password endpoint
-      const response = await axios.post<AuthApiResponse>("/api/auth/forgot-password", {
+      const response = await axios.post<AuthApiResponse>("/api/auth/forgot_password", {
         email,
         password
       })
