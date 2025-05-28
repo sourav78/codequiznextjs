@@ -74,3 +74,21 @@ export async function getUserByEmail(email: string): Promise<User | null> {
     throw new Error("Error while retriving user by email")
   }
 }
+
+export async function resetPassword(email: string, newPassword: string) {
+  try {
+    
+    // Update the password in the database
+    await db
+      .update(users)
+      .set({
+        password: newPassword
+      })
+      .where(eq(users.email, email))
+
+  } catch (error: any) {
+    console.error(error);
+    // Throwing the error
+    throw new Error("Error while resetting password")
+  }
+}

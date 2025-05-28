@@ -11,6 +11,8 @@ import { AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@heroui/button'
 import { Input } from '@heroui/input'
 import Link from 'next/link'
+import { AuthApiResponse } from '@/types/AuthApiResponse'
+import axios, { AxiosError } from 'axios'
 
 const ForgotPasswordForm = () => {
 
@@ -118,7 +120,10 @@ const ForgotPasswordForm = () => {
 
         console.log("Passord reset successfully")
 
-        // await handleCreateNewUserInDB({ userId: result.createdUserId, ...userInfo! })
+        // Resetting the password in the database
+        await handleResetPasswordInDB(email, data.password)
+
+        // Signing out the current session
         signOut({ redirectUrl: "/sign-in" })
       } else {
         console.error("Password reset failed:", result);
@@ -137,6 +142,30 @@ const ForgotPasswordForm = () => {
       setIsSubmitting(false)
     }
 
+  }
+
+  const handleResetPasswordInDB = async (email: string, password: string) => {
+    try {
+
+      // Send a POST request to the /api/auth/forgot-password endpoint
+      const response = await axios.post<AuthApiResponse>("/api/auth/forgot-password", {
+        email,
+        password
+      })
+
+      console.log(response.data);
+
+    } catch (error) {
+
+      if (axios.isAxiosError(error)) {
+        console.error("🔴 Reset failed:", {
+          status: error.response?.status,
+          body: error.response?.data,
+        })
+      } else {
+        console.error("⚠️ Unexpected error:", error)
+      }
+    }
   }
 
 
