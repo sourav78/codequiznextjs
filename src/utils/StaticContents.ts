@@ -254,3 +254,6 @@ export const Countries = {
   "zm": "Zambia",
   "zw": "Zimbabwe"
 }
+
+// Imagekit
+export const IMAGEKIT_PROFILE_FOLDERPATH = 'codequiz/user/profile_image';
