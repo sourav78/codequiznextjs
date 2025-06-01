@@ -1,5 +1,5 @@
 "use client"
-import SignInForm from '@/components/SignInForm'
+import SignInForm from '@/components/auth/SignInForm'
 import { useTheme } from 'next-themes';
 import Image from 'next/image'
 import React from 'react'

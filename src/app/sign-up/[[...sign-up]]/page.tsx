@@ -1,5 +1,5 @@
 "use client"
-import SignupForm from '@/components/SignupForm'
+import SignupForm from '@/components/auth/SignupForm'
 import { useTheme } from 'next-themes';
 import Image from 'next/image'
 import React from 'react'

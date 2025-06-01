@@ -6,7 +6,7 @@ import { z } from 'zod'
 import axios, { AxiosError } from 'axios'
 
 // Custom zod signup schema
-import { signUpSchema } from '../../schemas/signUpSchema'
+import { signUpSchema } from '../../../schemas/signUpSchema'
 import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
@@ -21,6 +21,7 @@ import { User } from '@/db/schema'
 import { AuthApiResponse } from '@/types/AuthApiResponse'
 import { UserRequest } from '@/types/UserType'
 import { Card, CardBody, CardFooter, CardHeader } from '@heroui/card'
+import { ErrorToast, SuccessToast } from '../ui/ShowToast'
 
 const SignupForm = () => {
 
@@ -89,12 +90,15 @@ const SignupForm = () => {
       })
 
       setVerifying(true)
+
+      // Show a success message
+      SuccessToast("Verification email sent! Please check your inbox.")
     } catch (error: any) {
       console.error("Sign-up error:", error);
 
       // Set the error message
-      setAuthError(
-        error.errors?.[0]?.message ||
+      ErrorToast(
+        error.errors[0].longMessage ||
         "An error occurred during sign-up. Please try again."
       );
     } finally {
@@ -131,15 +135,18 @@ const SignupForm = () => {
         await setActive({ session: result.createdSessionId })
 
         await handleCreateNewUserInDB({ userId: result.createdUserId, ...userInfo! })
+
+        SuccessToast("Verification successful! Account created successfully.");
+        // Redirect the user to the home page
         router.push("/")
       } else {
         console.error("Verification failed:", result);
-        setVerificationError("Verification failed. Please try again.")
+        ErrorToast("Verification failed. Please try again.")
       }
     } catch (error: any) {
       console.error("Verification error:", error);
-      setVerificationError(
-        error.errors?.[0]?.message ||
+      ErrorToast(
+        error.errors[0].longMessage ||
         "An error occurred during verification. Please try again."
       );
     } finally {
@@ -167,6 +174,11 @@ const SignupForm = () => {
       // If the error is an AxiosError, log the error message
       const axiosError = error as AxiosError<AuthApiResponse>;
       console.error("Error while creating new user in DB:", axiosError);
+
+      ErrorToast(
+        axiosError.response?.data.message ||
+        "An error occurred while creating your account. Please try again."
+      );
     }
   }
 
@@ -182,12 +194,6 @@ const SignupForm = () => {
           </p>
         </CardHeader>
         <CardBody className="overflow-visible mt-4 pb-2 px-4 sm:px-10 w-full">
-          {verificationError && (
-            <div className="bg-danger-50 text-danger-700 p-4 rounded-lg mb-6 flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 flex-shrink-0" />
-              <p>{verificationError}</p>
-            </div>
-          )}
           <form onSubmit={handleVerificationSubmit} className="space-y-4">
             <div className="space-y-2">
               <label
@@ -232,6 +238,8 @@ const SignupForm = () => {
                     await signUp.prepareEmailAddressVerification({
                       strategy: "email_code",
                     });
+
+
                   }
                 }}
                 className="text-primary hover:underline font-medium"
@@ -254,12 +262,6 @@ const SignupForm = () => {
           <h4 className="font-roboto font-bold text-2xl">Create your CodeQuiz account</h4>
         </CardHeader>
         <CardBody className="overflow-visible pb-2 px-4 sm:px-10 w-full">
-          {authError && (
-            <div className="bg-danger-50 text-danger-700 p-4 rounded-lg mb-6 flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 flex-shrink-0" />
-              <p>{authError}</p>
-            </div>
-          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <label

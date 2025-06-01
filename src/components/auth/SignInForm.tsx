@@ -5,7 +5,7 @@ import { useSignIn } from '@clerk/nextjs'
 import { z } from 'zod'
 
 // Custom zod signup schema
-import { signInSchema } from '../../schemas/signInSchema'
+import { signInSchema } from '../../../schemas/signInSchema'
 import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
@@ -16,6 +16,7 @@ import { Input } from "@heroui/input";
 import { Divider } from "@heroui/divider";
 import { AlertCircle, CheckCircle, Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import Link from 'next/link'
+import { ErrorToast, SuccessToast } from '../ui/ShowToast'
 
 const SignInForm = () => {
 
@@ -63,10 +64,13 @@ const SignInForm = () => {
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId })
 
+        SuccessToast("Login successful!");
+
+        // Redirect the user to the home page
         router.push("/")
       } else {
         console.error("Sign-in failed:", result);
-        setAuthError("Sign-in failed. Please try again.")
+        ErrorToast("Sign-in failed. Please try again.")
       }
 
     } catch (error: any) {
@@ -74,8 +78,8 @@ const SignInForm = () => {
       console.error("Sign-in error:", error);
 
       // Set the error message
-      setAuthError(
-        error.errors?.[0]?.message ||
+      ErrorToast(
+        error.errors[0].longMessage ||
         "An error occurred during sign-in. Please try again."
       );
     } finally {
@@ -91,12 +95,6 @@ const SignInForm = () => {
       </CardHeader>
 
       <CardBody className="overflow-visible pb-2 px-4 sm:px-10 w-full">
-        {authError && (
-          <div className="bg-danger-50 text-danger-700 p-4 rounded-lg mb-6 flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 flex-shrink-0" />
-            <p>{authError}</p>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
@@ -183,7 +181,7 @@ const SignInForm = () => {
               href="/sign-up"
               className="text-primary hover:underline font-medium"
             >
-              Sign in
+              Sign up
             </Link>
           </p>
         </div>

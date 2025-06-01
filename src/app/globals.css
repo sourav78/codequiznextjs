@@ -26,3 +26,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
+.heroui-toast, .heroui-toast * {
+  font-family: var(--font-poppins), var(--font-roboto), var(--font-geist-sans), sans-serif !important;
+}

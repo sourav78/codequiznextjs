@@ -1,8 +1,10 @@
 "use client"
 import { useClerk } from '@clerk/nextjs'
 import { Button } from '@heroui/button'
+import { addToast } from '@heroui/toast'
 import { Power } from 'lucide-react'
 import React from 'react'
+import { InfoToast, SuccessToast } from '../ui/ShowToast'
 
 const SignOutButton = () => {
 
@@ -11,7 +13,7 @@ const SignOutButton = () => {
   return (
     <Button
       color="danger"
-      className="w-full mt-4"
+      className="w-full mt-4 "
       size='lg'
       radius='sm'
       startContent={<Power />}

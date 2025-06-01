@@ -1,5 +1,5 @@
 "use client"
-import ForgotPasswordForm from '@/components/ForgotPasswordForm';
+import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
 import { useTheme } from 'next-themes';
 import Image from 'next/image'
 import React from 'react'

@@ -1,4 +1,4 @@
-import SignOutButton from "@/components/SignOutButton";
+import SignOutButton from "@/components/auth/SignOutButton";
 import { IMAGEKIT_PROFILE_FOLDERPATH } from "@/utils/StaticContents";
 import { auth } from "@clerk/nextjs/server";
 import { Button } from "@heroui/button";

@@ -5,14 +5,15 @@ import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { forgotPasswordSchema } from '../../schemas/forgotPasswordSchema'
+import { forgotPasswordSchema } from '../../../schemas/forgotPasswordSchema'
 import { Card, CardBody, CardFooter, CardHeader } from '@heroui/card'
-import { AlertCircle, Eye, EyeOff } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff, Info } from 'lucide-react'
 import { Button } from '@heroui/button'
 import { Input } from '@heroui/input'
 import Link from 'next/link'
 import { AuthApiResponse } from '@/types/AuthApiResponse'
 import axios, { AxiosError } from 'axios'
+import { ErrorToast, InfoToast, SuccessToast } from '../ui/ShowToast'
 
 const ForgotPasswordForm = () => {
 
@@ -73,14 +74,16 @@ const ForgotPasswordForm = () => {
       })
 
       setShowNewPasswordComponent(true)
+
+      InfoToast("Verification code sent to your email. Please check your inbox.")
     } catch (error: any) {
       console.error("Email verification error:", error);
 
       // Set the error message
-      setAuthError(
+      ErrorToast(
         error.errors?.[0]?.message ||
         "An error occurred during email verification. Please try again."
-      );
+      )
     } finally {
       // Set the isSubmitting to false
       setEmailIsSubmitting(false)
@@ -98,7 +101,7 @@ const ForgotPasswordForm = () => {
 
     // If the passwords don't match, set the error message
     if (data.password !== data.confirmPassword) {
-      setAuthError("Passwords don't match")
+      ErrorToast("Passwords don't match")
       return
     }
 
@@ -119,6 +122,7 @@ const ForgotPasswordForm = () => {
         await setActive({ session: result.createdSessionId })
 
         console.log("Passord reset successfully")
+        SuccessToast("Password reset successfully")
 
         // Resetting the password in the database
         await handleResetPasswordInDB(email, data.password)
@@ -127,16 +131,18 @@ const ForgotPasswordForm = () => {
         await signOut({ redirectUrl: "/sign-in" })
       } else {
         console.error("Password reset failed:", result);
-        setAuthError("Password reset failed. Please try again.")
+        ErrorToast("Password reset failed. Please try again.")
       }
     } catch (error: any) {
       console.error("Forgot password error:", error);
 
+        console.log(error.errors[0].longMessage);
+      
       // Set the error message
-      setAuthError(
-        error.errors?.[0]?.message ||
-        "An error occurred during resting password. Please try again."
-      );
+      ErrorToast(
+        error.errors[0].longMessage 
+        || "An error occurred during password reset. Please try again."
+      )
     } finally {
       // Set the isSubmitting to false
       setIsSubmitting(false)
@@ -156,15 +162,14 @@ const ForgotPasswordForm = () => {
       console.log(response.data);
 
     } catch (error) {
-
-      if (axios.isAxiosError(error)) {
-        console.error("🔴 Reset failed:", {
-          status: error.response?.status,
-          body: error.response?.data,
-        })
-      } else {
-        console.error("⚠️ Unexpected error:", error)
-      }
+      // Handle the error
+      const axiosError = error as AxiosError<AuthApiResponse>
+      console.error("Error resetting password in database:", axiosError);
+      ErrorToast(
+        axiosError.response?.data.message ||
+        "An error occured while resetting the password"
+      )
+      
     }
   }
 
@@ -178,12 +183,12 @@ const ForgotPasswordForm = () => {
         </p>
       </CardHeader>
       <CardBody className="overflow-visible mt-4 pb-2 px-4 sm:px-10 w-full">
-        {authError && (
+        {/* {authError && (
           <div className="bg-danger-50 text-danger-700 p-4 rounded-lg mb-6 flex items-center gap-2">
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <p>{authError}</p>
           </div>
-        )}
+        )} */}
 
         <form onSubmit={handleEmailVerification} className="space-y-4">
           <div className="space-y-2">
