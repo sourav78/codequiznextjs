@@ -1,11 +1,7 @@
 import * as z from 'zod';
 
 export const userOnboardSchema = z.object({
-  
-  userId: z
-    .string()
-    .uuid({ message: 'Invalid user ID' })
-    .min(1, { message: 'User ID is required' }),
+
   firstName: z
     .string()
     .min(1, { message: 'First name is required' }),
@@ -14,10 +10,14 @@ export const userOnboardSchema = z.object({
     .optional(),
   bio: z
     .string()
-    .optional(),
+    .min(1, { message: 'Write something about yourself' }),
   dob: z
-    .date()
-    .optional(),
+    .any()
+    .refine((val) => val === null || typeof val === "object", {
+      message: "Date of birth is required",
+    })
+    .nullable(),
   country: z
     .string()
+    .min(1, { message: 'Please select you country' }),
 })

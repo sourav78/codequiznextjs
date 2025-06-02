@@ -21,7 +21,7 @@ import { User } from '@/db/schema'
 import { AuthApiResponse } from '@/types/AuthApiResponse'
 import { UserRequest } from '@/types/UserType'
 import { Card, CardBody, CardFooter, CardHeader } from '@heroui/card'
-import { ErrorToast, SuccessToast } from '../ui/ShowToast'
+import { ErrorToast, InfoToast, SuccessToast } from '../ui/ShowToast'
 
 const SignupForm = () => {
 
@@ -92,7 +92,7 @@ const SignupForm = () => {
       setVerifying(true)
 
       // Show a success message
-      SuccessToast("Verification email sent! Please check your inbox.")
+      InfoToast("Verification email sent! Please check your inbox.")
     } catch (error: any) {
       console.error("Sign-up error:", error);
 
@@ -132,13 +132,12 @@ const SignupForm = () => {
       // If the verification is successful, set the active session
       // and redirect to the home page
       if (result.status === "complete") {
+        await handleCreateNewUserInDB({ userId: result.createdUserId, ...userInfo! })
+        
         await setActive({ session: result.createdSessionId })
 
-        await handleCreateNewUserInDB({ userId: result.createdUserId, ...userInfo! })
-
-        SuccessToast("Verification successful! Account created successfully.");
         // Redirect the user to the home page
-        router.push("/")
+        router.push("/onboarding")
       } else {
         console.error("Verification failed:", result);
         ErrorToast("Verification failed. Please try again.")
@@ -169,6 +168,8 @@ const SignupForm = () => {
 
       console.log(response.data);
 
+      SuccessToast("Verification successful! Account created successfully.");
+
     } catch (error) {
 
       // If the error is an AxiosError, log the error message
@@ -185,76 +186,76 @@ const SignupForm = () => {
   // This component is shown when we need to enter OTP
   if (verifying) {
     return (
-    <>
-      <Card className="bg-white dark:bg-card-dark gap-0 max-w-lg w-full rounded">
-        <CardHeader className="p-0 pt-8 px-4 sm:px-10 w-full flex flex-col items-start">
-          <h4 className="font-roboto font-bold text-2xl">Verify Your Email</h4>
-          <p className="text-default-500 text-center">
-            We've sent a verification code to your email
-          </p>
-        </CardHeader>
-        <CardBody className="overflow-visible mt-4 pb-2 px-4 sm:px-10 w-full">
-          <form onSubmit={handleVerificationSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label
-                htmlFor="verificationCode"
-                className="text-sm font-medium text-default-900"
-              >
-                Verification Code
-              </label>
-              <Input
-                id="verificationCode"
-                type="text"
-                radius="sm"
-                variant='bordered'
-                size='lg'
-                placeholder="Enter the 6-digit code"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
-                className="w-full mt-1"
-                autoFocus
-              />
-            </div>
-
-            <Button
-              type='submit'
-              color='primary'
-              className="w-full mt-4"
-              isLoading={isSubmitting}
-              size='lg'
-              radius='sm'
-            >
-              {isSubmitting ? "Verifying..." : "Verify Email"}
-            </Button>
-          </form>
-        </CardBody>
-        <CardFooter className="w-full">
-          <div className="w-full py-6 rounded-sm flex justify-center items-center gap-2 bg-blue-500/10 dark:bg-blue-900/10">
-            <p className="text-sm text-default-500">
-              Didn't receive a code?{" "}
-              <button
-                onClick={async () => {
-                  if (signUp) {
-                    await signUp.prepareEmailAddressVerification({
-                      strategy: "email_code",
-                    });
-
-
-                  }
-                }}
-                className="text-primary hover:underline font-medium"
-              >
-                Resend code
-              </button>
+      <>
+        <Card className="bg-white dark:bg-card-dark gap-0 max-w-lg w-full rounded">
+          <CardHeader className="p-0 pt-8 px-4 sm:px-10 w-full flex flex-col items-start">
+            <h4 className="font-roboto font-bold text-2xl">Verify Your Email</h4>
+            <p className="text-default-500 text-center">
+              We've sent a verification code to your email
             </p>
-          </div>
-        </CardFooter>
-      </Card>
-    </>
-  )
+          </CardHeader>
+          <CardBody className="overflow-visible mt-4 pb-2 px-4 sm:px-10 w-full">
+            <form onSubmit={handleVerificationSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <label
+                  htmlFor="verificationCode"
+                  className="text-sm font-medium text-default-900"
+                >
+                  Verification Code
+                </label>
+                <Input
+                  id="verificationCode"
+                  type="text"
+                  radius="sm"
+                  variant='bordered'
+                  size='lg'
+                  placeholder="Enter the 6-digit code"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  className="w-full mt-1"
+                  autoFocus
+                />
+              </div>
+
+              <Button
+                type='submit'
+                color='primary'
+                className="w-full mt-4"
+                isLoading={isSubmitting}
+                size='lg'
+                radius='sm'
+              >
+                {isSubmitting ? "Verifying..." : "Verify Email"}
+              </Button>
+            </form>
+          </CardBody>
+          <CardFooter className="w-full">
+            <div className="w-full py-6 rounded-sm flex justify-center items-center gap-2 bg-blue-500/10 dark:bg-blue-900/10">
+              <p className="text-sm text-default-500">
+                Didn't receive a code?{" "}
+                <button
+                  onClick={async () => {
+                    if (signUp) {
+                      await signUp.prepareEmailAddressVerification({
+                        strategy: "email_code",
+                      });
+
+
+                    }
+                  }}
+                  className="text-primary hover:underline font-medium"
+                >
+                  Resend code
+                </button>
+              </p>
+            </div>
+          </CardFooter>
+        </Card>
+      </>
+    )
   }
 
-  
+
   return (
     <>
       <Card className="bg-white dark:bg-card-dark gap-0 max-w-lg w-full rounded">
