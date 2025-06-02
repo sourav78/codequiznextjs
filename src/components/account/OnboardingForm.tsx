@@ -14,6 +14,7 @@ import { Button } from "@heroui/button";
 import { useRouter } from "next/navigation";
 import { Avatar, DatePicker, Select, SelectItem, Textarea } from "@heroui/react";
 import { Countries } from "@/utils/StaticContents";
+import ProfileImage from "./ProfileImage";
 
 type FormValues = z.infer<typeof userOnboardSchema>;
 
@@ -47,7 +48,13 @@ const OnboardingForm = () => {
     try {
       const formData = new FormData();
       if (cropedProfilePicture) {
-        formData.append("profileImage", cropedProfilePicture);
+        // Check if the file size is greater than 1MB
+        if(cropedProfilePicture.size > (1024 * 1024)){
+          ErrorToast("Profile image size should be less than 1MB");
+          return;
+        }else{
+          formData.append("profileImage", cropedProfilePicture);
+        }
       }
       formData.append("firstName", data.firstName);
       formData.append("lastName", data.lastName ?? "");
@@ -88,6 +95,10 @@ const OnboardingForm = () => {
           <h4 className="font-roboto font-bold text-2xl">Onboarding you</h4>
         </CardHeader>
         <CardBody className="overflow-visible pb-2 px-4 sm:px-10 w-full">
+
+          <div className="">
+            <ProfileImage setImageContainer={setCropedProfilePicture}/>
+          </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
             {/* First Name */}
             <div className="space-y-2">
@@ -212,7 +223,7 @@ const OnboardingForm = () => {
               size="lg"
               radius="sm"
             >
-              {isSubmitting ? "Creating account..." : "Create Account"}
+              {isSubmitting ? "Submitting..." : "Submit Details"}
             </Button>
           </form>
         </CardBody>

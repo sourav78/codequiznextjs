@@ -115,6 +115,6 @@ try {
   } catch (error: any) {
     console.error(error);
     // Throwing the error
-    throw new Error("Error while resetting password")
+    throw new Error("Error while saving user details")
   }
 }
