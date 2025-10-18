@@ -49,10 +49,10 @@ const OnboardingForm = () => {
       const formData = new FormData();
       if (cropedProfilePicture) {
         // Check if the file size is greater than 1MB
-        if(cropedProfilePicture.size > (1024 * 1024)){
+        if (cropedProfilePicture.size > (1024 * 1024)) {
           ErrorToast("Profile image size should be less than 1MB");
           return;
-        }else{
+        } else {
           formData.append("profileImage", cropedProfilePicture);
         }
       }
@@ -66,7 +66,7 @@ const OnboardingForm = () => {
       formData.append("country", data.country);
 
       // console.log(formData.get("country"));
-      
+
 
       const response = await axios.post<AuthApiResponse>(
         "/api/account/onboarding-user",
@@ -97,7 +97,7 @@ const OnboardingForm = () => {
         <CardBody className="overflow-visible pb-2 px-4 sm:px-10 w-full">
 
           <div className="">
-            <ProfileImage setImageContainer={setCropedProfilePicture}/>
+            <ProfileImage setImageContainer={setCropedProfilePicture} />
           </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
             {/* First Name */}
@@ -200,16 +200,19 @@ const OnboardingForm = () => {
                 placeholder="Select your country"
               >
                 {
-                  Object.entries(Countries).map(([code, country]) => (
-                    <SelectItem
-                      key={country}
-                      startContent={
-                      <Avatar alt={country} className="w-6 h-6" src={`https://flagcdn.com/${code.toLowerCase()}.svg`} />
-                      }
-                    >
-                      {country.charAt(0).toUpperCase() + country.slice(1)}
-                    </SelectItem>
-                  ))
+                  Object.entries(Countries)
+                    // Sort the array alphabetically based on the country name (the value)
+                    .sort(([, countryA], [, countryB]) => countryA.localeCompare(countryB))
+                    .map(([code, country]) => (
+                      <SelectItem
+                        key={country}
+                        startContent={
+                          <Avatar alt={country} className="w-6 h-6" src={`https://flagcdn.com/${code.toLowerCase()}.svg`} />
+                        }
+                      >
+                        {country.charAt(0).toUpperCase() + country.slice(1)}
+                      </SelectItem>
+                    ))
                 }
               </Select>
             </div>

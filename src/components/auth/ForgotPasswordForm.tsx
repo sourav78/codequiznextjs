@@ -332,7 +332,7 @@ const ForgotPasswordForm = () => {
           <p className="text-sm text-text dark:text-text-dark">
             <Link
               href="/sign-in"
-              className="text-primary hover:text-black font-medium"
+              className="text-primary hover:text-black dark:hover:text-white font-medium"
             >
               Return to sign in
             </Link>
