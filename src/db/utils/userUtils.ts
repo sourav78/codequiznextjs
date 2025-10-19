@@ -58,6 +58,25 @@ export async function getUserByUsername(userName: string): Promise<User | null> 
 }
 
 // This function used to get user by email
+export async function getUserByUserId(userId: string): Promise<User | null> {
+  try {
+
+    // Retrive user from database equal to the email
+    const newUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+
+      // Returning the user
+    return newUser[0] ?? null
+  }catch(error:any){
+    
+    // Throwing the error
+    throw new Error("Error while retriving user by userId")
+  }
+}
+
+// This function used to get user by email
 export async function getUserByEmail(email: string): Promise<User | null> {
   try {
 

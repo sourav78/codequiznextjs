@@ -15,11 +15,14 @@ import { useRouter } from "next/navigation";
 import { Avatar, DatePicker, Select, SelectItem, Textarea } from "@heroui/react";
 import { Countries } from "@/utils/StaticContents";
 import ProfileImage from "./ProfileImage";
+import { useClerk } from "@clerk/nextjs";
 
 type FormValues = z.infer<typeof userOnboardSchema>;
 
 const OnboardingForm = () => {
   const router = useRouter();
+
+  const {signOut} = useClerk()
 
   const {
     control,
@@ -74,15 +77,24 @@ const OnboardingForm = () => {
       );
 
       SuccessToast(response.data.message || "User details saved successfully");
-      router.push("/");
+      router.push("/"); // On success, navigate to the home page
+
     } catch (error: any) {
 
       console.log(error);
 
-      const axiosError = error as AxiosError<AuthApiResponse>;
-      ErrorToast(
-        axiosError.response?.data.message || "Failed to save the details. Try again"
-      );
+      const responseData = error.response?.data as AuthApiResponse;
+
+      // Check for the specific redirect action from your API
+      if (responseData?.action === "redirect" && responseData?.url) {
+        ErrorToast(responseData.message);
+        signOut({ redirectUrl: "/sign-up" })
+      } else {
+        // Handle all other API errors
+        ErrorToast(
+          responseData?.message || "Failed to save the details. Try again"
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }

@@ -1,9 +1,9 @@
-import { createUserDetails } from "@/db/utils/userUtils";
+import { createUserDetails, getUserByUserId } from "@/db/utils/userUtils";
 import CustomErrorHandler from "@/utils/ErrorHandler";
 import { UploadToImagekit } from "@/utils/ImagekitConfig";
 import { IMAGEKIT_PROFILE_FOLDERPATH } from "@/utils/StaticContents";
 import { validateOnboarding } from "@/utils/Validators/account.validate";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 
 export async function POST(request: Request) {
   try {
@@ -34,7 +34,31 @@ export async function POST(request: Request) {
       country
     })
 
-    let imagekitResponse = null;    
+
+    /**
+     * Before saving user details into database. First we chechk if userId exist in the database or not
+     * If not exist then delete the user from clerk system
+     */
+
+    const existingUser = await getUserByUserId(userId)
+
+    // If user not exist in the database
+    if (!existingUser) {
+
+      // Deleting user from clerk system
+      (await clerkClient()).users.deleteUser(userId)
+
+      // Returning the response to signup again
+      return Response.json({
+        success: false,
+        message: "User not registered in the server. Signup again",
+        action: 'redirect',
+        url: '/sign-up'
+      }, { status: 409 });
+    }
+
+
+    let imagekitResponse = null;
 
     // Check if the file is not null
     if (profileImage && profileImage.name != '') {
