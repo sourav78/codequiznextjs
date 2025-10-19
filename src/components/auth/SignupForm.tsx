@@ -7,7 +7,7 @@ import axios, { AxiosError } from 'axios'
 
 // Custom zod signup schema
 import { signUpSchema } from '../../../schemas/signUpSchema'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 
@@ -15,7 +15,7 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Divider } from "@heroui/divider";
 
-import { AlertCircle, CheckCircle, Eye, EyeOff, Lock, Mail } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { User } from '@/db/schema'
 import { AuthApiResponse } from '@/types/AuthApiResponse'
@@ -54,11 +54,25 @@ const SignupForm = () => {
 
   const [verificationCode, setVerificationCode] = useState<string>("")
   const [verificationError, setVerificationError] = useState<string | null>("")
+  const [isVerifivationCodeLoading, setIsVerifivationCodeLoading] = useState<boolean>(false)
+  const [verificationCodeCountdown, setVerificationCodeCountdown] = useState<number>(0)
 
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
 
   const [userInfo, setUserInfo] = useState<UserRequest | null>(null)
+
+
+  // Effect to manage the countdown timer
+  useEffect(() => {
+    let timer:any;
+    if (verificationCodeCountdown > 0) {
+      timer = setTimeout(() => setVerificationCodeCountdown(verificationCodeCountdown - 1), 1000);
+    }
+    // Cleanup function to clear the timer if the component unmounts
+    return () => clearTimeout(timer);
+  }, [verificationCodeCountdown]);
+
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
 
@@ -133,7 +147,7 @@ const SignupForm = () => {
       // and redirect to the home page
       if (result.status === "complete") {
         await handleCreateNewUserInDB({ userId: result.createdUserId, ...userInfo! })
-        
+
         await setActive({ session: result.createdSessionId })
 
         // Redirect the user to the home page
@@ -180,6 +194,23 @@ const SignupForm = () => {
         axiosError.response?.data.message ||
         "An error occurred while creating your account. Please try again."
       );
+    }
+  }
+
+  const handleResendVerificationCode = async () => {
+    setIsVerifivationCodeLoading(true)
+    try {
+      if (signUp) {
+        await signUp.prepareEmailAddressVerification({
+          strategy: "email_code",
+        });
+      }
+      setVerificationCodeCountdown(40)
+      InfoToast("Verification email sent! Please check your inbox.")
+    } catch (error: any) {
+      ErrorToast("Something went wrong while sending verification code")
+    }finally{
+      setIsVerifivationCodeLoading(false)
     }
   }
 
@@ -231,23 +262,29 @@ const SignupForm = () => {
           </CardBody>
           <CardFooter className="w-full">
             <div className="w-full py-6 rounded-sm flex justify-center items-center gap-2 bg-blue-500/10 dark:bg-blue-900/10">
-              <p className="text-sm text-default-500">
-                Didn't receive a code?{" "}
-                <button
-                  onClick={async () => {
-                    if (signUp) {
-                      await signUp.prepareEmailAddressVerification({
-                        strategy: "email_code",
-                      });
+
+              {
+                isVerifivationCodeLoading ? (
+                  <p className="text-sm text-default-500 flex justify-center items-center">
+                    Sending Verification... {" "}
+                    <Loader2 className='w-4 h-4 ml-1 text-primary animate-spin' />
+                  </p>
+                ) : (
+                  <p className="text-sm text-default-500 flex justify-center items-center">
+                    Didn't receive a code?{" "}
+                    <button
+                      onClick={handleResendVerificationCode}
+                      disabled={isVerifivationCodeLoading || verificationCodeCountdown > 0}
+                      className={`text-primary ${verificationCodeCountdown > 0 ? "" : "hover:underline"} font-medium ${verificationCodeCountdown > 0 && "cursor-not-allowed"}`}
+                    >
+                      
+                      {verificationCodeCountdown > 0 ? `Resend code in ${verificationCodeCountdown}s` : "Resend code"}
+                    </button>
+                  </p>
+                )
+              }
 
 
-                    }
-                  }}
-                  className="text-primary hover:underline font-medium"
-                >
-                  Resend code
-                </button>
-              </p>
             </div>
           </CardFooter>
         </Card>
