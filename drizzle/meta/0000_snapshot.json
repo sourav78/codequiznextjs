@@ -1,5 +1,5 @@
 {
-  "id": "eef3aecb-30ec-424f-bce8-6fc301c6392e",
+  "id": "39c3164e-517d-4509-8dfd-3780a3f3a0df",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -48,6 +48,13 @@
         "dob": {
           "name": "dob",
           "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender": {
+          "name": "gender",
+          "type": "gender_enum",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -112,8 +119,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "name": {
-          "name": "name",
+        "username": {
+          "name": "username",
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
@@ -132,6 +139,20 @@
         },
         "is_admin": {
           "name": "is_admin",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "is_activated": {
+          "name": "is_activated",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "is_admin_ban": {
+          "name": "is_admin_ban",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
@@ -156,11 +177,11 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "users_name_unique": {
-          "name": "users_name_unique",
+        "users_username_unique": {
+          "name": "users_username_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "name"
+            "username"
           ]
         },
         "users_email_unique": {
@@ -176,7 +197,17 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.gender_enum": {
+      "name": "gender_enum",
+      "schema": "public",
+      "values": [
+        "male",
+        "female",
+        "others"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

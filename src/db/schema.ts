@@ -1,4 +1,4 @@
-import { boolean, date, integer, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, date, integer, pgEnum, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 
@@ -16,6 +16,12 @@ export const users = pgTable("users", {
   // Verification fields
   isAdmin: boolean("is_admin").default(false).notNull(),
 
+  // Account status fields
+  isActivated: boolean("is_activated").default(true).notNull(),
+
+  // Ban status
+  isAdminBan: boolean("is_admin_ban").default(false).notNull(),
+
   // timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
@@ -23,6 +29,9 @@ export const users = pgTable("users", {
     .$onUpdate(() => new Date())
     .notNull(),
 });
+
+// Gender Enum
+export const genderEnum = pgEnum("gender_enum", ["male", "female", "others"])
 
 
 // This is the schema for the user_info table
@@ -43,7 +52,9 @@ export const userInfo = pgTable("user_info", {
   // Optional fields
   bio: text("bio"),
   profilePic: varchar("profile_picture", { length: 255 }),
+  coverPic: varchar("profile_picture", { length: 255 }),
   dob: date("dob"),
+  gender: genderEnum("gender"),
   country: varchar("country", { length: 50 }),
 
   // timestamps
