@@ -8,7 +8,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_12_120000) do
     t.string   "password",                      limit: 50
     t.boolean  "is_admin",        null: false, default: false
     t.boolean  "is_verified",     null: false, default: false
-    t.string   "verification_code",             limit: 6
+    t.boolean  "is_activate",     null: false, default: true
+    t.boolean  "is_admin_ban",     null: false, default: false
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
   end
@@ -19,7 +20,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_12_120000) do
     t.string   "last_name",                   limit: 50
     t.text     "bio"
     t.string   "profile_picture",            limit: 255
+    t.string   "cover_picture",            limit: 255
     t.date     "dob"
+    t.string   "gender"
     t.string   "country",                     limit: 50
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
