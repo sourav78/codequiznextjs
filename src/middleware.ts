@@ -8,6 +8,7 @@ const isPublicRoute = createRouteMatcher([
   '/forgot-password(.*)',
   '/api/account/onboarding_user(.*)',
   '/api/img-kit(.*)',
+  '/api/test-async(.*)'
 ])
 const isProtectedRoute = createRouteMatcher(['/'])
 

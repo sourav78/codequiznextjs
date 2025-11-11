@@ -52,7 +52,7 @@ export const userInfo = pgTable("user_info", {
   // Optional fields
   bio: text("bio"),
   profilePic: varchar("profile_picture", { length: 255 }),
-  coverPic: varchar("profile_picture", { length: 255 }),
+  coverPic: varchar("cover_picture", { length: 255 }),
   dob: date("dob"),
   gender: genderEnum("gender"),
   country: varchar("country", { length: 50 }),

@@ -1,7 +1,7 @@
 import ImageKit from "imagekit";
 import { UploadResponse } from "imagekit/dist/libs/interfaces";
 import IKResponse from "imagekit/dist/libs/interfaces/IKResponse";
-import CustomErrorHandler from "./ErrorHandler";
+import CustomErrorHandler from "../helpers/ErrorHandler";
 
 // Initialize ImageKit with your credentials
 const imagekit = new ImageKit({

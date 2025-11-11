@@ -1,4 +1,4 @@
-import { resetPassword } from "@/db/utils/userUtils";
+import { resetPassword } from "@/db/repository/userRepository";
 import bcrypt from "bcrypt";
 
 export async function POST(req: Request){

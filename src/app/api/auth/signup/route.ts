@@ -1,4 +1,4 @@
-import { createUser, getUserByEmail, getUserByUsername } from "@/db/utils/userUtils";
+import { createUser, getUserByEmail, getUserByUsername } from "@/db/repository/userRepository";
 import bcrypt from "bcrypt";
 
 // This function used to register a new user

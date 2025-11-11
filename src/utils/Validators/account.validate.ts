@@ -1,5 +1,5 @@
 import { OnboardingValidatorType } from "@/types/UserType";
-import CustomErrorHandler from "../ErrorHandler";
+import CustomErrorHandler from "../helpers/ErrorHandler";
 
 
 // Validating users onboarding details and throw custom error

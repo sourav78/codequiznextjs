@@ -1,5 +1,5 @@
-import CustomErrorHandler from "@/utils/ErrorHandler";
-import { UploadToImagekit } from "@/utils/ImagekitConfig";
+import CustomErrorHandler from "@/utils/helpers/ErrorHandler";
+import { UploadToImagekit } from "@/utils/libs/ImagekitConfig";
 import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "..";
 import { users, UserInsert, User, userInfo, UserInfoInsert, UserInfo } from "../schema";
-import CustomErrorHandler from "@/utils/ErrorHandler";
+import CustomErrorHandler from "@/utils/helpers/ErrorHandler";
 
 
 // Creating a new user using drizzle

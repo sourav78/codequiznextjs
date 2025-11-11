@@ -1,0 +1,1 @@
+ALTER TABLE "user_info" ADD COLUMN "cover_picture" varchar(255);

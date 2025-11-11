@@ -1,6 +1,6 @@
-import { createUserDetails, getUserByUserId } from "@/db/utils/userUtils";
-import CustomErrorHandler from "@/utils/ErrorHandler";
-import { UploadToImagekit } from "@/utils/ImagekitConfig";
+import { createUserDetails, getUserByUserId } from "@/db/repository/userRepository";
+import CustomErrorHandler from "@/utils/helpers/ErrorHandler";
+import { UploadToImagekit } from "@/utils/libs/ImagekitConfig";
 import { IMAGEKIT_PROFILE_FOLDERPATH } from "@/utils/StaticContents";
 import { validateOnboarding } from "@/utils/Validators/account.validate";
 import { auth, clerkClient } from "@clerk/nextjs/server";
